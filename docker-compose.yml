@@ -1,0 +1,11 @@
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    volumes:
+        - ./:/opt
+    working_dir: /opt
+    restart: always
+    # Use this to keep the container running
+    tty: true
