@@ -1,15 +1,16 @@
-import requests scrapers
+import json
+import requests
 import io
 from requests.exceptions import HTTPError
 from webdav4.client import Client
 
 filetype_order = [
-    'xml',
-    'html',
-    'odt',
-    'ocr', # Simpele XML, deze moet boven PDF, want ocr resultaten zijn ook vaak als PDF beschikbaar, maar deze variant heeft dan de voorkeur
-    'kaarten',
-    'pdf'
+    ['xml', 'xml-nl', 'xml-en'], # xml-nl en xml-en komen enkel voor bij verdragen ('vd') en we willen beide downloaden
+    ['html'],
+    ['odt'],
+    ['ocr'], # Simpele XML, deze moet boven PDF, want ocr resultaten zijn ook vaak als PDF beschikbaar, maar deze variant heeft dan de voorkeur
+    ['kaarten'], # XML met beschrijving van een jpg kaart
+    ['pdf']
 ]
 
 class Officiele_Bekendmakingen(object):
@@ -31,7 +32,7 @@ class Officiele_Bekendmakingen(object):
 
     # Download file from Officiële Bekendmakingen and upload it to Research
     # Drive
-    def _download_and_upload_file(self, url):
+    def _download_and_upload_file(self, url, record, saved_record):
         print(f'Downloading {url}')
 
         file = ''
@@ -45,11 +46,14 @@ class Officiele_Bekendmakingen(object):
             file_response = self.session.get(url)
             file_response.raise_for_status()
             self._create_folder(file)
+            if not saved_record:
+                self.client.upload_fileobj(io.BytesIO(json.dumps(record).encode('utf-8')), f'{self.base_dir}{"/".join(file.split("/")[:-2])}/record.json')
             self.client.upload_fileobj(io.BytesIO(file_response.content), f'{self.base_dir}{file}')
         except HTTPError as http_err:
             print(f'HTTP error occurred: {http_err}')
         except Exception as err:
             print(f'An error occurred: {err}')
+
 
 
     #def run(start_date, end_date):
@@ -70,9 +74,12 @@ class Officiele_Bekendmakingen(object):
                 if 'manifestation' in item_url:
                     item_url = [item_url]
 
+                saved_record = False
                 for item in item_url:
+                    #if file order
                     url = item['$']
-                    self._download_and_upload_file(url)
+                    self._download_and_upload_file(url, record, saved_record)
+                    saved_record = True
 
             # Deal with shifting index?
             input('Press enter to continue')
