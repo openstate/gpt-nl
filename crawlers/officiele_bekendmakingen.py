@@ -4,16 +4,11 @@ import requests
 import io
 from collections import defaultdict
 from requests.exceptions import HTTPError
+from requests.adapters import HTTPAdapter, Retry
 
 from utils.webdav_utils import WebDAVUtils
 
-logging.basicConfig(
-    filename="../logs/officiele_bekendmakingen.log",
-    filemode='a',
-    format="%(asctime)s [%(levelname)s] %(message)s",
-    level=logging.INFO
-)
-logger = logging.getLogger()
+logger = logging.getLogger('obk')
 
 #filetype_order = [
 #    ['xml', 'xml-nl', 'xml-en'], # xml-nl en xml-en komen enkel voor bij verdragen ('vd') en we willen beide downloaden
@@ -24,79 +19,94 @@ logger = logging.getLogger()
 #    ['pdf']
 #]
 
-filetypes = {
-    'officielepublicaties': {
-        'download_order': [
-            ['html',]
-            ['odt',]
-            ['pdf',]
-            ['xml'] # Deze xml bevat schijnbaar nooit noemenswaardige geen teksten (soms enkel 'sluiting')
-        ],
-        'do_not_download': [
-            'metadata',
-            'metadataowms'
-        ]
-    },
-    'lokalebekendmakingen': {
-        'download_order': [
-            'html'
-        ],
-        'do_not_download': [
-            'metadata',
-        ]
-    },
-    '': {
-        'download_order': [
-            '',
-        ],
-        'do_not_download': [
-            '',
-        ]
-    },
-    '': {
-        'download_order': [
-            '',
-        ],
-        'do_not_download': [
-            '',
-        ]
-    },
-    '': {
-        'download_order': [
-            '',
-        ],
-        'do_not_download': [
-            '',
-        ]
-    },
-    '': {
-        'download_order': [
-            '',
-        ],
-        'do_not_download': [
-            '',
-        ]
-    },
-}
-
 class Officiele_Bekendmakingen(object):
+    maximum_records = '100'
+
+    filetypes = {
+        'datacollecties': {
+            'download_order': [],
+            'do_not_download': [
+                'gml',
+                'html',
+                'metadata',
+                'metadataowms',
+                'pdf',
+                'xml'
+            ]
+        },
+        'officielepublicaties': {
+            'download_order': [
+                ['html'],
+                ['odt'],
+                ['pdf'],
+                ['xml'] # Deze xml bevat schijnbaar nooit noemenswaardige geen teksten (soms enkel 'sluiting')
+            ],
+            'do_not_download': [
+                'metadata',
+                'metadataowms'
+            ]
+        },
+        'lokalebekendmakingen': {
+            'download_order': [
+                ['html'],
+                ['metadata']
+            ],
+            'do_not_download': []
+        },
+        'samenwerkendecatalogi': {
+            'download_order': [
+                ['metadata']
+            ],
+            'do_not_download': []
+        },
+        'sgd': {
+            'download_order': [
+                ['ocr', 'kaarten'],
+                ['pdf']
+            ],
+            'do_not_download': [
+                'coordinaten',
+                'jpg',
+                'metadata'
+            ]
+        },
+        'tuchtrecht': {
+            'download_order': [
+                ['xml'],
+                ['pdf']
+            ],
+            'do_not_download': []
+        },
+        'vd': {
+            'download_order': [
+                ['xml-nl', 'xml-en'],
+                ['pdf']
+            ],
+            'do_not_download': [
+                'pdf' # Er zit sporadisch aan PDF bij, maar bij steekproeven leken deze niet te bestaan.
+            ]
+        }
+    }
+
     def __init__(self, settings):
         self.base_dir = 'GPT-NL OpenStateFoundation (Projectfolder)/officiele_bekendmakingen/'
 
         self.session = requests.Session()
+        retries = Retry(total=5, backoff_factor=1, status_forcelist=[502, 503, 504])
+        self.session.mount('https://', HTTPAdapter(max_retries=retries))
 
         self.webdav_utils = WebDAVUtils(settings)
 
     # Download file from Officiële Bekendmakingen and upload it to Research
     # Drive
-    def _download_and_upload_file(self, url, record, first_saved__item):
-        print(f'Downloading {url}')
+    def _download_and_upload_file(self, url, record, first_saved_item):
+        logger.debug(f'Downloading {url}')
 
         file = ''
         if url.startswith('https://repository.overheid.nl/frbr/'):
             file = url[36:]
         else:
-            print("Not saving file, because URL doesn't start with https://repository.overheid.nl/frbr/")
+            logger.error("Not saving file, because URL doesn't start with https://repository.overheid.nl/frbr/")
             return
 
         try:
@@ -109,23 +119,33 @@ class Officiele_Bekendmakingen(object):
                 self.webdav_utils.upload_fileobj(io.BytesIO(json.dumps(record).encode('utf-8')), f'{self.base_dir}{"/".join(file.split("/")[:-2])}/record.json')
             self.webdav_utils.upload_fileobj(io.BytesIO(file_response.content), f'{self.base_dir}{file}')
         except HTTPError as http_err:
-            print(f'HTTP error occurred: {http_err}')
+            logger.error(f'HTTP error occurred during file download: {http_err}')
         except Exception as err:
-            print(f'An error occurred: {err}')
+            logger.error(f'An error occurred during file download: {err}')
 
 
 
-    #def run(start_date, end_date):
-    def run(self):
+    def run(self, start_record, end_record):
         # List all documents (more than 6,1 million on 2024-12-16) sorted by oldest date
-        query_url = 'https://repository.overheid.nl/sru?&query=*%20sortBy%20dt.modified%20/sort.ascending&startRecord={}&maximumRecords=100&httpAccept=application/json'
+        query_url = 'https://repository.overheid.nl/sru?&query=*%20sortBy%20dt.modified%20/sort.ascending&startRecord={}&maximumRecords={}&httpAccept=application/json'
 
         next_record_position = '1'
+        if start_record:
+            next_record_position = start_record
 
         while next_record_position:
-            response = self.session.get(query_url.format(next_record_position))
-            response_json = response.json()['searchRetrieveResponse']
-            next_record_position = str(response_json.get('nextRecordPosition', ''))
+            logger.info(f'Start Record: {next_record_position}')
+
+            try:
+                response = self.session.get(query_url.format(next_record_position, self.maximum_records))
+                response.raise_for_status()
+                response_json = response.json()['searchRetrieveResponse']
+                next_record_position = str(response_json.get('nextRecordPosition', ''))
+            except Exception as e:
+                logger.error(f'An error occurred during SRU query: {e}')
+                # It seems that some SRU queries return status 200 but empty,
+                # so try the next batch
+                next_record_position = str(int(next_record_position) + int(self.maximum_records))
 
             # If there is only 1 item, then the SRU API doesn't return a
             # list, but a dict, so we need to create a list ourselves
@@ -145,17 +165,18 @@ class Officiele_Bekendmakingen(object):
 
                 first_saved_item = True
 
+                collection = {}
                 try:
-                    collection = filetypes[record['recordData']['gzd']['originalData']['meta']['tpmeta']['product-area']]
-                except as e:
+                    collection = self.filetypes[record['recordData']['gzd']['originalData']['meta']['tpmeta']['product-area']]
+                except Exception as e:
                     logger.info(f'Ran into unknown collection: {e}')
 
                 found_filetype = False
-                for filetypes in collection['download_order']:
-                    for filetype in filetypes:
-                        if filetype in available_filetypes:
+                for filetypes_to_download in collection['download_order']:
+                    for filetype_to_download in filetypes_to_download:
+                        if filetype_to_download in available_filetypes:
                             found_filetype = True
-                            for url in available_filetypes[filetype]:
+                            for url in available_filetypes[filetype_to_download]:
                                 self._download_and_upload_file(url, record, first_saved_item)
                                 first_saved_item = False
                     # If one or more filetypes from the current download_order
@@ -168,8 +189,8 @@ class Officiele_Bekendmakingen(object):
                 for available_filetype in available_filetypes:
                     known_filetype = False
 
-                    for filetypes in collection['download_order']:
-                        if available_filetype in filetypes:
+                    for filetypes_to_download in collection['download_order']:
+                        if available_filetype in filetypes_to_download:
                             known_filetype = True
 
                     if available_filetype in collection['do_not_download']:
@@ -178,5 +199,6 @@ class Officiele_Bekendmakingen(object):
                     if not known_filetype:
                         logger.info(f'Unknown filetype for record "{record["recordData"]["gzd"]["originalData"]["meta"]["owmskern"]["identifier"]}": {available_filetype}')
 
-            # Deal with shifting index?
-            input('Press enter to continue')
+            if end_record and int(end_record) < int(next_record_position):
+                logger.info(f'Stopped! Reached end_record {end_record} (next_record_position {next_record_position})')
+                break

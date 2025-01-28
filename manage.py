@@ -23,12 +23,11 @@ def cli():
     pass
 
 @cli.command()
-@click.option('--start_date', type=DATETIME_TYPE)
-@click.option('--end_date', type=DATETIME_TYPE)
-def officiele_bekendmakingen(start_date, end_date):
+@click.option('--start-record')
+@click.option('--end-record')
+def officiele_bekendmakingen(start_record, end_record):
     officiele_bekendmakingen = Officiele_Bekendmakingen(WEBDAV)
-    #officiele_bekendmakingen.run(start_date, end_date)
-    officiele_bekendmakingen.run()
+    officiele_bekendmakingen.run(start_record, end_record)
 
 @cli.command()
 @click.option('--start_date', type=DATETIME_TYPE)
