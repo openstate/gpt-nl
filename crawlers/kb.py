@@ -72,6 +72,10 @@ class KB(object):
 
                 next_page = self._get_next_page(next_page)
                 sleep(1)
+            except etree.XMLSyntaxError as e:
+                logger.info(f"XMLSyntaxError for page {next_page}")
+                next_page = self._get_next_page(next_page)
+                sleep(1)
             except OSError as e: # last page was retrieved
                 next_page = None
 
@@ -107,15 +111,19 @@ class KB(object):
                 metadata = article.xpath("@data-metadata")[0]
                 metadata_json = json.loads(str(metadata))
 
-                self._log_message(f"START {identifier} {datetime.now()}")
+                message = f"START {identifier} {datetime.now().replace(microsecond=0).isoformat()}"
+                self._log_message(message)
+                print(message)
 
                 book = self._get_book(identifier)
-                metadata_json["numberOfPages"] = len(book.getchildren())
+                number_of_pages = len(book.getchildren())
+                metadata_json["numberOfPages"] = number_of_pages
                 self._upload_book(book, identifier)
                 self._upload_metadata(metadata_json, identifier)
 
-                self._log_message(f"END   {identifier} {datetime.now()}")
-
+                message = f"END   {identifier} {datetime.now().replace(microsecond=0).isoformat()} {number_of_pages}pages"
+                self._log_message(message)
+                print(message)
 
             if len(articles) == 0:
                 logger.info(f"Length of articles is 0 for page {next_paginated_results_page}, end of books reached")
