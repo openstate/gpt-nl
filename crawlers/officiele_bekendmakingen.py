@@ -4,7 +4,8 @@ import requests
 import io
 from collections import defaultdict
 from requests.exceptions import HTTPError
-from webdav4.client import Client
+
+from utils.webdav_utils import WebDAVUtils
 
 logging.basicConfig(
     filename="../logs/officiele_bekendmakingen.log",
@@ -84,16 +85,7 @@ class Officiele_Bekendmakingen(object):
 
         self.session = requests.Session()
 
-        # Create a WEBDAV connection
-        self.client = Client(settings['URL'], auth=(settings['USER'], settings['PASSWORD']))
-
-    # Check if all parent folders exist, if not create them
-    def _create_folder(self, file):
-        path = self.base_dir
-        for folder in file.split('/')[:-1]:
-            path += f'{folder}/'
-            if not self.client.exists(path):
-                self.client.mkdir(path)
+        self.webdav_utils = WebDAVUtils(settings)
 
     # Download file from Officiële Bekendmakingen and upload it to Research
     # Drive
@@ -110,12 +102,12 @@ class Officiele_Bekendmakingen(object):
         try:
             file_response = self.session.get(url)
             file_response.raise_for_status()
-            self._create_folder(file)
+            self.webdav_utils.create_folder(self.base_dir, file)
             # If this is the first item of this record to be saved, then also
             # save the record metadata
             if first_saved_item:
-                self.client.upload_fileobj(io.BytesIO(json.dumps(record).encode('utf-8')), f'{self.base_dir}{"/".join(file.split("/")[:-2])}/record.json')
-            self.client.upload_fileobj(io.BytesIO(file_response.content), f'{self.base_dir}{file}')
+                self.webdav_utils.upload_fileobj(io.BytesIO(json.dumps(record).encode('utf-8')), f'{self.base_dir}{"/".join(file.split("/")[:-2])}/record.json')
+            self.webdav_utils.upload_fileobj(io.BytesIO(file_response.content), f'{self.base_dir}{file}')
         except HTTPError as http_err:
             print(f'HTTP error occurred: {http_err}')
         except Exception as err:
