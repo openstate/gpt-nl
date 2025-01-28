@@ -4,7 +4,9 @@ import requests
 import io
 from collections import defaultdict
 from requests.exceptions import HTTPError
-from requests.adapters import HTTPAdapter, Retry
+from requests.adapters import Retry
+from requests_ratelimiter import LimiterAdapter
+from pathlib import Path
 
 from utils.webdav_utils import WebDAVUtils
 
@@ -20,6 +22,9 @@ logger = logging.getLogger('obk')
 #]
 
 class Officiele_Bekendmakingen(object):
+    # 'webdav' or 'local'
+    save_location = 'local'
+
     maximum_records = '100'
 
     filetypes = {
@@ -89,11 +94,17 @@ class Officiele_Bekendmakingen(object):
     }
 
     def __init__(self, settings):
-        self.base_dir = 'GPT-NL OpenStateFoundation (Projectfolder)/officiele_bekendmakingen/'
+        self.base_dir = ''
+        if self.save_location == 'webdav':
+            self.base_dir = 'GPT-NL OpenStateFoundation (Projectfolder)/officiele_bekendmakingen/'
+        elif self.save_location == 'local':
+            self.base_dir = './downloaded_files/officiele_bekendmakingen/'
 
         self.session = requests.Session()
         retries = Retry(total=5, backoff_factor=1, status_forcelist=[502, 503, 504])
-        self.session.mount('https://', HTTPAdapter(max_retries=retries))
+        adapter = LimiterAdapter(per_minute=50, burst=1, max_retries=retries)
+        self.session.mount('https://', adapter)
+        self.session.mount('http://', adapter)
 
         self.webdav_utils = WebDAVUtils(settings)
 
@@ -112,12 +123,22 @@ class Officiele_Bekendmakingen(object):
         try:
             file_response = self.session.get(url)
             file_response.raise_for_status()
-            self.webdav_utils.create_folder(self.base_dir, file)
-            # If this is the first item of this record to be saved, then also
-            # save the record metadata
-            if first_saved_item:
-                self.webdav_utils.upload_fileobj(io.BytesIO(json.dumps(record).encode('utf-8')), f'{self.base_dir}{"/".join(file.split("/")[:-2])}/record.json')
-            self.webdav_utils.upload_fileobj(io.BytesIO(file_response.content), f'{self.base_dir}{file}')
+
+            if self.save_location == 'webdav':
+                self.webdav_utils.create_folder(self.base_dir, file)
+                # If this is the first item of this record to be saved, then also
+                # save the record metadata
+                if first_saved_item:
+                    self.webdav_utils.upload_fileobj(io.BytesIO(json.dumps(record).encode('utf-8')), f'{self.base_dir}{"/".join(file.split("/")[:-2])}/record.json')
+                self.webdav_utils.upload_fileobj(io.BytesIO(file_response.content), f'{self.base_dir}{file}')
+            elif self.save_location == 'local':
+                Path(self.base_dir + '/'.join(file.split('/')[:-1])).mkdir(parents=True, exist_ok=True)
+                if first_saved_item:
+                    with open(f'{self.base_dir}{"/".join(file.split("/")[:-2])}/record.json', 'w') as OUT:
+                        OUT.write(json.dumps(record))
+                with open(f'{self.base_dir}{file}', 'wb') as OUT:
+                    OUT.write(file_response.content)
+
         except HTTPError as http_err:
             logger.error(f'HTTP error occurred during file download: {http_err}')
         except Exception as err:
