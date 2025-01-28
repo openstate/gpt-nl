@@ -86,7 +86,7 @@ class KB(object):
 
     #def run(start_date, end_date):
     def run(self):
-        query_url = "https://www.delpher.nl/nl/pres/results/multi?query=digitizationProject+any+%22dpo%22&page={}&coll=boeken&actions%5B%5D=paginate&actions%5B%5D=resultsCount&actions%5B%5D=breadcrumbs&actions%5B%5D=sortlinks&actions%5B%5D=results&actions%5B%5D=facets&actions%5B%5D=facettoggle"
+        query_url = "https://www.delpher.nl/nl/pres/results/multi?query=digitizationProject+any+%22dpo%22&page={}&coll=boeken&actions%5B%5D=results"
 
         next_paginated_results_page = '1'
         while next_paginated_results_page:
@@ -94,8 +94,9 @@ class KB(object):
             response = self.session.get(query_url.format(next_paginated_results_page))
             response_json = response.json()
             results = html.fromstring(response_json['resultsAction'])
+            articles = results.xpath("//article")
 
-            for article_index, article in enumerate(results.xpath("//article"), start=1):
+            for article_index, article in enumerate(articles, start=1):
                 self._log_message(f"Article index on this page: {article_index}")
                 identifier = article.xpath("@data-identifier")[0]
                 if self._has_been_processed(identifier):
@@ -115,4 +116,9 @@ class KB(object):
 
                 self._log_message(f"END   {identifier} {datetime.now()}")
 
-            next_paginated_results_page = self._get_next_paginated_results_page(next_paginated_results_page)
+
+            if len(articles) == 0:
+                logger.info(f"Length of articles is 0 for page {next_paginated_results_page}, end of books reached")
+                next_paginated_results_page = None
+            else:
+                next_paginated_results_page = self._get_next_paginated_results_page(next_paginated_results_page)
