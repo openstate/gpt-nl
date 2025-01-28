@@ -102,7 +102,7 @@ class Officiele_Bekendmakingen(object):
 
         self.session = requests.Session()
         retries = Retry(total=5, backoff_factor=1, status_forcelist=[502, 503, 504])
-        adapter = LimiterAdapter(per_minute=50, burst=1, max_retries=retries)
+        adapter = LimiterAdapter(per_minute=40, burst=1, max_retries=retries)
         self.session.mount('https://', adapter)
         self.session.mount('http://', adapter)
 
