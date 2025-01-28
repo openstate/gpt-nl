@@ -71,11 +71,11 @@ class KB(object):
                 book.append(page_ocr_xml.getroot())
 
                 next_page = self._get_next_page(next_page)
-                sleep(1)
+                sleep(0.5)
             except etree.XMLSyntaxError as e:
                 logger.info(f"XMLSyntaxError for page {next_page}")
                 next_page = self._get_next_page(next_page)
-                sleep(1)
+                sleep(0.5)
             except OSError as e: # last page was retrieved
                 next_page = None
 
@@ -87,6 +87,7 @@ class KB(object):
     def _log_message(self, message):
         logger.info(message)
         logging.StreamHandler().flush()
+        print(message)
 
     #def run(start_date, end_date):
     def run(self):
@@ -111,9 +112,7 @@ class KB(object):
                 metadata = article.xpath("@data-metadata")[0]
                 metadata_json = json.loads(str(metadata))
 
-                message = f"START {identifier} {datetime.now().replace(microsecond=0).isoformat()}"
-                self._log_message(message)
-                print(message)
+                self._log_message(f"START {identifier} {datetime.now().replace(microsecond=0).isoformat()}")
 
                 book = self._get_book(identifier)
                 number_of_pages = len(book.getchildren())
@@ -121,9 +120,7 @@ class KB(object):
                 self._upload_book(book, identifier)
                 self._upload_metadata(metadata_json, identifier)
 
-                message = f"END   {identifier} {datetime.now().replace(microsecond=0).isoformat()} {number_of_pages}pages"
-                self._log_message(message)
-                print(message)
+                self._log_message(f"END   {identifier} {datetime.now().replace(microsecond=0).isoformat()} {number_of_pages}pages")
 
             if len(articles) == 0:
                 logger.info(f"Length of articles is 0 for page {next_paginated_results_page}, end of books reached")
