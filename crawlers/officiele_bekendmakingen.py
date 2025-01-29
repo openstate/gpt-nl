@@ -12,14 +12,12 @@ from utils.webdav_utils import WebDAVUtils
 
 logger = logging.getLogger('obk')
 
-#filetype_order = [
-#    ['xml', 'xml-nl', 'xml-en'], # xml-nl en xml-en komen enkel voor bij verdragen ('vd') en we willen beide downloaden
-#    ['html'],
-#    ['odt'],
-#    ['ocr'], # Simpele XML, deze moet boven PDF, want ocr resultaten zijn ook vaak als PDF beschikbaar, maar deze variant heeft dan de voorkeur
-#    ['kaarten'], # XML met beschrijving van een jpg kaart
-#    ['pdf']
-#]
+# Add extra logs before making a retry request
+class LogRetry(Retry):
+  def __init__(self, *args, **kwargs):
+    logger.info(f'Retrying request')
+    super().__init__(*args, **kwargs)
+
 
 class Officiele_Bekendmakingen(object):
     # 'webdav' or 'local'
@@ -101,7 +99,7 @@ class Officiele_Bekendmakingen(object):
             self.base_dir = './downloaded_files/officiele_bekendmakingen/'
 
         self.session = requests.Session()
-        retries = Retry(total=5, backoff_factor=1, status_forcelist=[502, 503, 504])
+        retries = LogRetry(total=50, status_forcelist=[502, 503, 504])
         adapter = LimiterAdapter(per_minute=40, burst=1, max_retries=retries)
         self.session.mount('https://', adapter)
         self.session.mount('http://', adapter)
