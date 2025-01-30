@@ -99,7 +99,7 @@ class Officiele_Bekendmakingen(object):
             self.base_dir = './downloaded_files/officiele_bekendmakingen/'
 
         self.session = requests.Session()
-        retries = LogRetry(total=50, status_forcelist=[502, 503, 504])
+        retries = LogRetry(total=200, backoff_factor=1, backoff_max=2, status_forcelist=[502, 503, 504])
         adapter = LimiterAdapter(per_minute=40, burst=1, max_retries=retries)
         self.session.mount('https://', adapter)
         self.session.mount('http://', adapter)
