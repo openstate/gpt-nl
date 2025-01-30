@@ -57,6 +57,7 @@ class KB(object):
         self._upload_webdav("metadata", filename, io.BytesIO(json.dumps(metadata_json).encode('utf-8')))
 
     def _upload_webdav(self, fileType, filename, bytesIO, attempt = 1):
+        exception = None
         try:
             self.webdav_utils.create_folder(self.base_dir, filename)
             self.webdav_utils.upload_fileobj(bytesIO, f'{self.base_dir}{filename}', overwrite=True)
