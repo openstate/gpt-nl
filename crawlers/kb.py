@@ -50,27 +50,39 @@ class KB(object):
 
     def _upload_book(self, book, identifier):
         filename = f"{identifier}.xml"
-        try:
-            self.webdav_utils.create_folder(self.base_dir, filename)
-            self.webdav_utils.upload_fileobj(io.BytesIO(etree.tostring(book)), f'{self.base_dir}{filename}', overwrite=True)
-        except httpx.ConnectError as e:
-            self._log_message(f"ConnectError when uploading book: {e}")
-            raise
-        except Exception as e:
-            self._log_message(f"Unknown exception when uploading book: {e}")
-            raise
+        self._upload_webdav("book", filename, io.BytesIO(etree.tostring(book)))
 
     def _upload_metadata(self, metadata_json, identifier):
         filename = f"{identifier}.txt"
+        self._upload_webdav("metadata", filename, io.BytesIO(json.dumps(metadata_json).encode('utf-8')))
+
+    def _upload_webdav(self, fileType, filename, bytesIO, attempt = 1):
         try:
             self.webdav_utils.create_folder(self.base_dir, filename)
-            self.webdav_utils.upload_fileobj(io.BytesIO(json.dumps(metadata_json).encode('utf-8')), f'{self.base_dir}{filename}', overwrite=True)
+            self.webdav_utils.upload_fileobj(bytesIO, f'{self.base_dir}{filename}', overwrite=True)
         except httpx.ConnectError as e:
-            self._log_message(f"ConnectError when uploading metadata: {e}")
-            raise
+            self._log_message(f"ConnectError when uploading {fileType} attempt {attempt}: {e}")
+            exception = e
+        except httpx.ReadTimeout as e:
+            self._log_message(f"ReadTimeout when uploading {fileType} attempt {attempt}: {e}")
+            exception = e
         except Exception as e:
-            self._log_message(f"Unknown exception when uploading metadata: {e}")
+            self._log_message(f"Unknown exception when uploading {fileType} attempt {attempt}: {e.__class__.__name__}, {e}")
             raise
+
+        if exception:
+            attempt += 1
+            sleepTime = self._get_sleep_time(attempt)
+            if sleepTime:
+                sleep(sleepTime)
+                self._upload_webdav(fileType, filename, bytesIO, attempt)
+            else:
+                raise exception
+
+    def _get_sleep_time(attempt):
+        if attempt > 9:
+            return None
+        return 2**attempt
 
     def _get_book(self, identifier):
         page_ocr_url = "http://resolver.kb.nl/resolve?urn={}:{}:ocr"
