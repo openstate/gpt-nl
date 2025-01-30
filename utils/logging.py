@@ -19,16 +19,7 @@ LOGGING = {
             'class': 'logging.FileHandler',
             'formatter': 'gpt',
             'filename': KB_LOG_FILE
-        }
-    },
-    'loggers': {
-        'kb': {
-            'handlers': ['kb'],
-            'level': 'DEBUG',
-            'propagate': False,
-        }
-    },
-    'handlers': {
+        },
         'obk': {
             'level': 'INFO',
             'class': 'logging.FileHandler',
@@ -37,11 +28,16 @@ LOGGING = {
         }
     },
     'loggers': {
+        'kb': {
+            'handlers': ['kb'],
+            'level': 'DEBUG',
+            'propagate': False,
+        },
         'obk': {
             'handlers': ['obk'],
             'level': 'INFO',
             'propagate': False,
         }
-    }
+    },
 }
 logging.config.dictConfig(LOGGING)

@@ -6,6 +6,7 @@ from datetime import datetime
 import logging
 from utils.logging import KB_LOG_FILE
 import requests
+import httpx
 
 from utils.webdav_utils import WebDAVUtils
 from lxml import html, etree
@@ -49,13 +50,27 @@ class KB(object):
 
     def _upload_book(self, book, identifier):
         filename = f"{identifier}.xml"
-        self.webdav_utils.create_folder(self.base_dir, filename)
-        self.webdav_utils.upload_fileobj(io.BytesIO(etree.tostring(book)), f'{self.base_dir}{filename}', overwrite=True)
+        try:
+            self.webdav_utils.create_folder(self.base_dir, filename)
+            self.webdav_utils.upload_fileobj(io.BytesIO(etree.tostring(book)), f'{self.base_dir}{filename}', overwrite=True)
+        except httpx.ConnectError as e:
+            self._log_message(f"ConnectError when uploading book: {e}")
+            raise
+        except Exception as e:
+            self._log_message(f"Unknown exception when uploading book: {e}")
+            raise
 
     def _upload_metadata(self, metadata_json, identifier):
         filename = f"{identifier}.txt"
-        self.webdav_utils.create_folder(self.base_dir, filename)
-        self.webdav_utils.upload_fileobj(io.BytesIO(json.dumps(metadata_json).encode('utf-8')), f'{self.base_dir}{filename}', overwrite=True)
+        try:
+            self.webdav_utils.create_folder(self.base_dir, filename)
+            self.webdav_utils.upload_fileobj(io.BytesIO(json.dumps(metadata_json).encode('utf-8')), f'{self.base_dir}{filename}', overwrite=True)
+        except httpx.ConnectError as e:
+            self._log_message(f"ConnectError when uploading metadata: {e}")
+            raise
+        except Exception as e:
+            self._log_message(f"Unknown exception when uploading metadata: {e}")
+            raise
 
     def _get_book(self, identifier):
         page_ocr_url = "http://resolver.kb.nl/resolve?urn={}:{}:ocr"
@@ -77,6 +92,7 @@ class KB(object):
                 next_page = self._get_next_page(next_page)
                 sleep(0.5)
             except OSError as e: # last page was retrieved
+                self._log_message(f"OSError - probably last page was retreived: {e}")
                 next_page = None
 
         return book
