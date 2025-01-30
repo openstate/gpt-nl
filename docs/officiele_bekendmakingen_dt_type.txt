@@ -1,0 +1,128 @@
+{
+  "searchRetrieveResponse": {
+    "version": 2.0,
+    "numberOfRecords": 599645,
+    "records": {
+      "record": [
+      ]
+    },
+    "nextRecordPosition": 11,
+    "echoedSearchRetrieveRequest": {
+      "query": "(c.product-area==officielepublicaties)and((dt.creator==\"Tweede Kamer der Staten-Generaal\")or(dt.creator==\"Tweede Kamer OCV %2f UCV\"))",
+      "startRecord": 1,
+      "maximumRecords": 10,
+      "recordXMLEscaping": "xml",
+      "recordSchema": "http://standaarden.overheid.nl/sru/"
+    },
+    "resultCountPrecision": "info:srw/vocabulary/resultCountPrecision/1/estimate",
+    "facetedResults": {
+      "facet": {
+        "index": "dt.type",
+        "terms": {
+          "term": [
+            {
+              "actualTerm": "Kamerstuk",
+              "query": "dt.type==\"Kamerstuk\"",
+              "count": 287893
+            },
+            {
+              "actualTerm": "Bijlage",
+              "query": "dt.type==\"Bijlage\"",
+              "count": 102340
+            },
+            {
+              "actualTerm": "Aanhangsel van de Handelingen",
+              "query": "dt.type==\"Aanhangsel van de Handelingen\"",
+              "count": 53777
+            },
+            {
+              "actualTerm": "Handeling",
+              "query": "dt.type==\"Handeling\"",
+              "count": 47249
+            },
+            {
+              "actualTerm": "Kamervragen zonder Antwoord",
+              "query": "dt.type==\"Kamervragen zonder Antwoord\"",
+              "count": 42434
+            },
+            {
+              "actualTerm": "Kamervragen (Aanhangsel)",
+              "query": "dt.type==\"Kamervragen (Aanhangsel)\"",
+              "count": 32416
+            },
+            {
+              "actualTerm": "Kamervragen zonder antwoord",
+              "query": "dt.type==\"Kamervragen zonder antwoord\"",
+              "count": 21675
+            },
+            {
+              "actualTerm": "Niet-dossierstuk",
+              "query": "dt.type==\"Niet-dossierstuk\"",
+              "count": 10296
+            },
+            {
+              "actualTerm": "Agenda",
+              "query": "dt.type==\"Agenda\"",
+              "count": 1208
+            },
+            {
+              "actualTerm": "Kamerstuk Kamerstuk",
+              "query": "dt.type==\"Kamerstuk Kamerstuk\"",
+              "count": 251
+            },
+            {
+              "actualTerm": "overige overheidsinformatie",
+              "query": "dt.type==\"overige overheidsinformatie\"",
+              "count": 77
+            },
+            {
+              "actualTerm": "Overig",
+              "query": "dt.type==\"Overig\"",
+              "count": 59
+            },
+            {
+              "actualTerm": "interne regeling",
+              "query": "dt.type==\"interne regeling\"",
+              "count": 18
+            },
+            {
+              "actualTerm": "Interne regelingen",
+              "query": "dt.type==\"Interne regelingen\"",
+              "count": 14
+            },
+            {
+              "actualTerm": "delegatie- of mandaatbesluit",
+              "query": "dt.type==\"delegatie- of mandaatbesluit\"",
+              "count": 4
+            },
+            {
+              "actualTerm": "ander besluit van algemene strekking",
+              "query": "dt.type==\"ander besluit van algemene strekking\"",
+              "count": 3
+            },
+            {
+              "actualTerm": "bekendmaking aan de scheepvaart",
+              "query": "dt.type==\"bekendmaking aan de scheepvaart\"",
+              "count": 3
+            },
+            {
+              "actualTerm": "Bekendmakingen aan de scheepvaart",
+              "query": "dt.type==\"Bekendmakingen aan de scheepvaart\"",
+              "count": 3
+            },
+            {
+              "actualTerm": "Besluiten van algemene strekking",
+              "query": "dt.type==\"Besluiten van algemene strekking\"",
+              "count": 3
+            },
+            {
+              "actualTerm": "Schriftelijke vragen",
+              "query": "dt.type==\"Schriftelijke vragen\"",
+              "count": 1
+            }
+          ]
+        }
+      }
+    }
+  }
+}

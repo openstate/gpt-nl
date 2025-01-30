@@ -1,0 +1,483 @@
+{
+  "searchRetrieveResponse": {
+    "version": 2.0,
+    "numberOfRecords": 599635,
+    "records": {
+      "record": [
+      ]
+    },
+    "nextRecordPosition": 11,
+    "echoedSearchRetrieveRequest": {
+      "query": "(c.product-area==officielepublicaties)and((dt.creator==\"Tweede Kamer der Staten-Generaal\")or(dt.creator==\"Tweede Kamer OCV %2f UCV\"))",
+      "startRecord": 1,
+      "maximumRecords": 10,
+      "recordXMLEscaping": "xml",
+      "recordSchema": "http://standaarden.overheid.nl/sru/"
+    },
+    "resultCountPrecision": "info:srw/vocabulary/resultCountPrecision/1/estimate",
+    "facetedResults": {
+      "facet": {
+        "index": "w.subrubriek",
+        "terms": {
+          "term": [
+            {
+              "actualTerm": "Brief",
+              "query": "w.subrubriek==\"Brief\"",
+              "count": 70443
+            },
+            {
+              "actualTerm": "Schriftelijke vragen",
+              "query": "w.subrubriek==\"Schriftelijke vragen\"",
+              "count": 61663
+            },
+            {
+              "actualTerm": "Motie",
+              "query": "w.subrubriek==\"Motie\"",
+              "count": 54606
+            },
+            {
+              "actualTerm": "Antwoord",
+              "query": "w.subrubriek==\"Antwoord\"",
+              "count": 40317
+            },
+            {
+              "actualTerm": "Aanhangsel van de Handelingen",
+              "query": "w.subrubriek==\"Aanhangsel van de Handelingen\"",
+              "count": 32417
+            },
+            {
+              "actualTerm": "Overig",
+              "query": "w.subrubriek==\"Overig\"",
+              "count": 17486
+            },
+            {
+              "actualTerm": "Amendement",
+              "query": "w.subrubriek==\"Amendement\"",
+              "count": 12752
+            },
+            {
+              "actualTerm": "Mededeling",
+              "query": "w.subrubriek==\"Mededeling\"",
+              "count": 12541
+            },
+            {
+              "actualTerm": "Verslag",
+              "query": "w.subrubriek==\"Verslag\"",
+              "count": 9402
+            },
+            {
+              "actualTerm": "Stemmingen",
+              "query": "w.subrubriek==\"Stemmingen\"",
+              "count": 8625
+            },
+            {
+              "actualTerm": "Plenair debat",
+              "query": "w.subrubriek==\"Plenair debat\"",
+              "count": 5472
+            },
+            {
+              "actualTerm": "Voorstel van wet",
+              "query": "w.subrubriek==\"Voorstel van wet\"",
+              "count": 3968
+            },
+            {
+              "actualTerm": "Brief regering",
+              "query": "w.subrubriek==\"Brief regering\"",
+              "count": 2890
+            },
+            {
+              "actualTerm": "Nota van wijziging",
+              "query": "w.subrubriek==\"Nota van wijziging\"",
+              "count": 2488
+            },
+            {
+              "actualTerm": "Mededelingen",
+              "query": "w.subrubriek==\"Mededelingen\"",
+              "count": 2158
+            },
+            {
+              "actualTerm": "Koninklijke boodschap",
+              "query": "w.subrubriek==\"Koninklijke boodschap\"",
+              "count": 2073
+            },
+            {
+              "actualTerm": "Mondelinge vragen",
+              "query": "w.subrubriek==\"Mondelinge vragen\"",
+              "count": 1988
+            },
+            {
+              "actualTerm": "Regeling van werkzaamheden",
+              "query": "w.subrubriek==\"Regeling van werkzaamheden\"",
+              "count": 1945
+            },
+            {
+              "actualTerm": "Vragenuur",
+              "query": "w.subrubriek==\"Vragenuur\"",
+              "count": 1890
+            },
+            {
+              "actualTerm": "Opening",
+              "query": "w.subrubriek==\"Opening\"",
+              "count": 1505
+            },
+            {
+              "actualTerm": "Stemming",
+              "query": "w.subrubriek==\"Stemming\"",
+              "count": 1353
+            },
+            {
+              "actualTerm": "Sluiting",
+              "query": "w.subrubriek==\"Sluiting\"",
+              "count": 1230
+            },
+            {
+              "actualTerm": "Lijst van ingekomen stukken",
+              "query": "w.subrubriek==\"Lijst van ingekomen stukken\"",
+              "count": 1185
+            },
+            {
+              "actualTerm": "Behandeling",
+              "query": "w.subrubriek==\"Behandeling\"",
+              "count": 682
+            },
+            {
+              "actualTerm": "Debat",
+              "query": "w.subrubriek==\"Debat\"",
+              "count": 669
+            },
+            {
+              "actualTerm": "Memorie van toelichting",
+              "query": "w.subrubriek==\"Memorie van toelichting\"",
+              "count": 632
+            },
+            {
+              "actualTerm": "Verslag van een algemeen overleg",
+              "query": "w.subrubriek==\"Verslag van een algemeen overleg\"",
+              "count": 356
+            },
+            {
+              "actualTerm": "Hamerstukken",
+              "query": "w.subrubriek==\"Hamerstukken\"",
+              "count": 333
+            },
+            {
+              "actualTerm": "Stukkenlijst",
+              "query": "w.subrubriek==\"Stukkenlijst\"",
+              "count": 268
+            },
+            {
+              "actualTerm": "Bijvoegsel",
+              "query": "w.subrubriek==\"Bijvoegsel\"",
+              "count": 265
+            },
+            {
+              "actualTerm": "Verslag (nader, tweede nader etc.)",
+              "query": "w.subrubriek==\"Verslag (nader, tweede nader etc.)\"",
+              "count": 174
+            },
+            {
+              "actualTerm": "Nader antwoord",
+              "query": "w.subrubriek==\"Nader antwoord\"",
+              "count": 165
+            },
+            {
+              "actualTerm": "Nota n.a.v. het (nader, tweede nader, enz.) verslag",
+              "query": "w.subrubriek==\"Nota n.a.v. het (nader, tweede nader, enz.) verslag\"",
+              "count": 135
+            },
+            {
+              "actualTerm": "Lijst van vragen en antwoorden",
+              "query": "w.subrubriek==\"Lijst van vragen en antwoorden\"",
+              "count": 127
+            },
+            {
+              "actualTerm": "Beëdiging",
+              "query": "w.subrubriek==\"Beëdiging\"",
+              "count": 124
+            },
+            {
+              "actualTerm": "Gewijzigde motie (nader)",
+              "query": "w.subrubriek==\"Gewijzigde motie (nader)\"",
+              "count": 106
+            },
+            {
+              "actualTerm": "Advies Raad van State en nader rapport",
+              "query": "w.subrubriek==\"Advies Raad van State en nader rapport\"",
+              "count": 103
+            },
+            {
+              "actualTerm": "Verslag van een schriftelijk overleg",
+              "query": "w.subrubriek==\"Verslag van een schriftelijk overleg\"",
+              "count": 103
+            },
+            {
+              "actualTerm": "Jaarverslag",
+              "query": "w.subrubriek==\"Jaarverslag\"",
+              "count": 101
+            },
+            {
+              "actualTerm": "Afscheid",
+              "query": "w.subrubriek==\"Afscheid\"",
+              "count": 71
+            },
+            {
+              "actualTerm": "Herdenking",
+              "query": "w.subrubriek==\"Herdenking\"",
+              "count": 59
+            },
+            {
+              "actualTerm": "Aanbieding",
+              "query": "w.subrubriek==\"Aanbieding\"",
+              "count": 54
+            },
+            {
+              "actualTerm": "Noten",
+              "query": "w.subrubriek==\"Noten\"",
+              "count": 53
+            },
+            {
+              "actualTerm": "Verslag houdende een lijst van vragen en antwoorden",
+              "query": "w.subrubriek==\"Verslag houdende een lijst van vragen en antwoorden\"",
+              "count": 51
+            },
+            {
+              "actualTerm": "Brief commissie",
+              "query": "w.subrubriek==\"Brief commissie\"",
+              "count": 44
+            },
+            {
+              "actualTerm": "Verslag commissie voor de Verzoekschriften en de Burgerinitiatieven",
+              "query": "w.subrubriek==\"Verslag commissie voor de Verzoekschriften en de Burgerinitiatieven\"",
+              "count": 44
+            },
+            {
+              "actualTerm": "Nota van verbetering",
+              "query": "w.subrubriek==\"Nota van verbetering\"",
+              "count": 29
+            },
+            {
+              "actualTerm": "Nader rapport",
+              "query": "w.subrubriek==\"Nader rapport\"",
+              "count": 28
+            },
+            {
+              "actualTerm": "Verslag van een wetgevingsoverleg",
+              "query": "w.subrubriek==\"Verslag van een wetgevingsoverleg\"",
+              "count": 25
+            },
+            {
+              "actualTerm": "Brief lid / fractie",
+              "query": "w.subrubriek==\"Brief lid / fractie\"",
+              "count": 24
+            },
+            {
+              "actualTerm": "Brief Kamer",
+              "query": "w.subrubriek==\"Brief Kamer\"",
+              "count": 21
+            },
+            {
+              "actualTerm": "Verslag van een bijeenkomst",
+              "query": "w.subrubriek==\"Verslag van een bijeenkomst\"",
+              "count": 19
+            },
+            {
+              "actualTerm": "Interpellatievragen",
+              "query": "w.subrubriek==\"Interpellatievragen\"",
+              "count": 15
+            },
+            {
+              "actualTerm": "Brief Algemene Rekenkamer",
+              "query": "w.subrubriek==\"Brief Algemene Rekenkamer\"",
+              "count": 13
+            },
+            {
+              "actualTerm": "Verslag van een notaoverleg",
+              "query": "w.subrubriek==\"Verslag van een notaoverleg\"",
+              "count": 13
+            },
+            {
+              "actualTerm": "Advies van andere adviesorganen",
+              "query": "w.subrubriek==\"Advies van andere adviesorganen\"",
+              "count": 11
+            },
+            {
+              "actualTerm": "Verslag van een hoorzitting / rondetafelgesprek",
+              "query": "w.subrubriek==\"Verslag van een hoorzitting / rondetafelgesprek\"",
+              "count": 10
+            },
+            {
+              "actualTerm": "Brief Presidium",
+              "query": "w.subrubriek==\"Brief Presidium\"",
+              "count": 9
+            },
+            {
+              "actualTerm": "Interpellatiedebat",
+              "query": "w.subrubriek==\"Interpellatiedebat\"",
+              "count": 9
+            },
+            {
+              "actualTerm": "Motie (gewijzigd/nader)",
+              "query": "w.subrubriek==\"Motie (gewijzigd/nader)\"",
+              "count": 7
+            },
+            {
+              "actualTerm": "Verklaring",
+              "query": "w.subrubriek==\"Verklaring\"",
+              "count": 7
+            },
+            {
+              "actualTerm": "Voorstel tot wijziging Reglement van Orde",
+              "query": "w.subrubriek==\"Voorstel tot wijziging Reglement van Orde\"",
+              "count": 7
+            },
+            {
+              "actualTerm": "Voorstel van de Europese Commissie",
+              "query": "w.subrubriek==\"Voorstel van de Europese Commissie\"",
+              "count": 7
+            },
+            {
+              "actualTerm": "Voorstel van wet (initiatiefvoorstel)",
+              "query": "w.subrubriek==\"Voorstel van wet (initiatiefvoorstel)\"",
+              "count": 7
+            },
+            {
+              "actualTerm": "Advies Raad van State en reactie van de indiener(s)",
+              "query": "w.subrubriek==\"Advies Raad van State en reactie van de indiener(s)\"",
+              "count": 6
+            },
+            {
+              "actualTerm": "Geleidende brief",
+              "query": "w.subrubriek==\"Geleidende brief\"",
+              "count": 6
+            },
+            {
+              "actualTerm": "Memorie van toelichting (initiatiefvoorstel)",
+              "query": "w.subrubriek==\"Memorie van toelichting (initiatiefvoorstel)\"",
+              "count": 6
+            },
+            {
+              "actualTerm": "Nota van wijziging (initiatiefvoorstel)",
+              "query": "w.subrubriek==\"Nota van wijziging (initiatiefvoorstel)\"",
+              "count": 6
+            },
+            {
+              "actualTerm": "Verslag van een werkbezoek",
+              "query": "w.subrubriek==\"Verslag van een werkbezoek\"",
+              "count": 6
+            },
+            {
+              "actualTerm": "Aanbiedingsbrief",
+              "query": "w.subrubriek==\"Aanbiedingsbrief\"",
+              "count": 4
+            },
+            {
+              "actualTerm": "Oorspronkelijke tekst",
+              "query": "w.subrubriek==\"Oorspronkelijke tekst\"",
+              "count": 4
+            },
+            {
+              "actualTerm": "Rapport",
+              "query": "w.subrubriek==\"Rapport\"",
+              "count": 4
+            },
+            {
+              "actualTerm": "Verslag van een commissiedebat",
+              "query": "w.subrubriek==\"Verslag van een commissiedebat\"",
+              "count": 4
+            },
+            {
+              "actualTerm": "Initiatiefnota",
+              "query": "w.subrubriek==\"Initiatiefnota\"",
+              "count": 3
+            },
+            {
+              "actualTerm": "overig",
+              "query": "w.subrubriek==\"overig\"",
+              "count": 3
+            },
+            {
+              "actualTerm": "Brief Europese Commissie",
+              "query": "w.subrubriek==\"Brief Europese Commissie\"",
+              "count": 2
+            },
+            {
+              "actualTerm": "Brief Nationale ombudsman",
+              "query": "w.subrubriek==\"Brief Nationale ombudsman\"",
+              "count": 2
+            },
+            {
+              "actualTerm": "Kamerstuk",
+              "query": "w.subrubriek==\"Kamerstuk\"",
+              "count": 2
+            },
+            {
+              "actualTerm": "Rapport Algemene Rekenkamer",
+              "query": "w.subrubriek==\"Rapport Algemene Rekenkamer\"",
+              "count": 2
+            },
+            {
+              "actualTerm": "Advies Afdeling advisering Raad van State en Nader rapport",
+              "query": "w.subrubriek==\"Advies Afdeling advisering Raad van State en Nader rapport\"",
+              "count": 1
+            },
+            {
+              "actualTerm": "Brief commissie aan bewindspersoon",
+              "query": "w.subrubriek==\"Brief commissie aan bewindspersoon\"",
+              "count": 1
+            },
+            {
+              "actualTerm": "Brief CTIVD",
+              "query": "w.subrubriek==\"Brief CTIVD\"",
+              "count": 1
+            },
+            {
+              "actualTerm": "Brief derden (organisatie)",
+              "query": "w.subrubriek==\"Brief derden (organisatie)\"",
+              "count": 1
+            },
+            {
+              "actualTerm": "Brief president Hoge Raad",
+              "query": "w.subrubriek==\"Brief president Hoge Raad\"",
+              "count": 1
+            },
+            {
+              "actualTerm": "Brief Voorzitter",
+              "query": "w.subrubriek==\"Brief Voorzitter\"",
+              "count": 1
+            },
+            {
+              "actualTerm": "Nota",
+              "query": "w.subrubriek==\"Nota\"",
+              "count": 1
+            },
+            {
+              "actualTerm": "Nota n.a.v. het (nader/tweede nader/enz.) verslag",
+              "query": "w.subrubriek==\"Nota n.a.v. het (nader/tweede nader/enz.) verslag\"",
+              "count": 1
+            },
+            {
+              "actualTerm": "Verslag van een rapporteur",
+              "query": "w.subrubriek==\"Verslag van een rapporteur\"",
+              "count": 1
+            },
+            {
+              "actualTerm": "Voorstel van wet (tweede lezing)",
+              "query": "w.subrubriek==\"Voorstel van wet (tweede lezing)\"",
+              "count": 1
+            },
+            {
+              "actualTerm": "Voorstel voor een richtlijn/verordening/overig",
+              "query": "w.subrubriek==\"Voorstel voor een richtlijn/verordening/overig\"",
+              "count": 1
+            },
+            {
+              "actualTerm": "Wijzigingen voorgesteld door de regering",
+              "query": "w.subrubriek==\"Wijzigingen voorgesteld door de regering\"",
+              "count": 1
+            }
+          ]
+        }
+      }
+    }
+  }
+}
