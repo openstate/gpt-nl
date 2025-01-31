@@ -80,7 +80,7 @@ class KB(object):
             else:
                 raise exception
 
-    def _get_sleep_time(attempt):
+    def _get_sleep_time(self, attempt):
         if attempt > 9:
             return None
         return 2**attempt
