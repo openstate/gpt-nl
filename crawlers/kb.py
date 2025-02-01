@@ -43,6 +43,35 @@ class KB(object):
         page += 1
         return str(page)
 
+    def _get_next_paginated_results(self, url, attempt = 1):
+        exception = None
+        try:
+            response = self.session.get(url)
+            response_json = response.json()
+            results = html.fromstring(response_json['resultsAction'])
+            return results.xpath("//article")
+        except httpx.ConnectError as e:
+            self._log_message(f"ConnectError when getting paginated results attempt {attempt}: {e}")
+            exception = e
+        except httpx.ReadTimeout as e:
+            self._log_message(f"ReadTimeout when getting paginated results  attempt {attempt}: {e}")
+            exception = e
+        except requests.exceptions.JSONDecodeError as e:
+            self._log_message(f"JSONDecodeError when getting paginated results  attempt {attempt}: {e}")
+            exception = e
+        except Exception as e:
+            self._log_message(f"Unknown exception when getting paginated results  attempt {attempt}: {e.__class__.__name__}, {e}")
+            raise
+
+        if exception:
+            attempt += 1
+            sleepTime = self._get_sleep_time(attempt)
+            if sleepTime:
+                sleep(sleepTime)
+                self._get_next_paginated_results(url, attempt)
+            else:
+                raise exception
+
     def _get_next_page(self, page_str):
         page = int(page_str)
         page += 1
@@ -125,10 +154,7 @@ class KB(object):
         next_paginated_results_page = '1'
         while next_paginated_results_page:
             self._log_message(f"Paginated results page: {next_paginated_results_page}")
-            response = self.session.get(query_url.format(next_paginated_results_page))
-            response_json = response.json()
-            results = html.fromstring(response_json['resultsAction'])
-            articles = results.xpath("//article")
+            articles = self._get_next_paginated_results(query_url.format(next_paginated_results_page))
 
             for article_index, article in enumerate(articles, start=1):
                 self._log_message(f"Article index on this page: {article_index}")
