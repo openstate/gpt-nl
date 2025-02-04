@@ -30,12 +30,10 @@ def officiele_bekendmakingen(start_record, end_record):
     officiele_bekendmakingen.run(start_record, end_record)
 
 @cli.command()
-@click.option('--start_date', type=DATETIME_TYPE)
-@click.option('--end_date', type=DATETIME_TYPE)
-def kb(start_date, end_date):
+@click.option('--start-page', default='1')
+def kb(start_page):
     kb = KB(WEBDAV)
-    #kb.run(start_date, end_date)
-    kb.run()
+    kb.run(start_page)
 
 if __name__ == '__main__':
     cli()

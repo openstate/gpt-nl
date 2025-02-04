@@ -147,11 +147,10 @@ class KB(object):
         logging.StreamHandler().flush()
         print(message)
 
-    #def run(start_date, end_date):
-    def run(self):
+    def run(self, start_page):
         query_url = "https://www.delpher.nl/nl/pres/results/multi?query=digitizationProject+any+%22dpo%22&page={}&coll=boeken&actions%5B%5D=results"
 
-        next_paginated_results_page = '1'
+        next_paginated_results_page = start_page
         while next_paginated_results_page:
             self._log_message(f"Paginated results page: {next_paginated_results_page}")
             articles = self._get_next_paginated_results(query_url.format(next_paginated_results_page))
