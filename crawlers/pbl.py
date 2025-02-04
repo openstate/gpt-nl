@@ -74,7 +74,7 @@ class PBL(object):
             sleepTime = self._get_sleep_time(attempt)
             if sleepTime:
                 sleep(sleepTime)
-                self._get_next_paginated_results(url, attempt)
+                return self._get_next_paginated_results(url, attempt)
             else:
                 raise exception
 
