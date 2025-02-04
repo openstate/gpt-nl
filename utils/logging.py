@@ -4,6 +4,7 @@ import logging.config
 PROJECT_PATH = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 KB_LOG_FILE = os.path.join(PROJECT_PATH, 'kb.log')
 OBK_LOG_FILE = os.path.join(PROJECT_PATH, 'officiele_bekendmakingen.log')
+PBL_LOG_FILE = os.path.join(PROJECT_PATH, 'pbl.log')
 
 LOGGING = {
     'version': 1,
@@ -25,6 +26,12 @@ LOGGING = {
             'class': 'logging.FileHandler',
             'formatter': 'gpt',
             'filename': OBK_LOG_FILE
+        },
+        'pbl': {
+            'level': 'DEBUG',
+            'class': 'logging.FileHandler',
+            'formatter': 'gpt',
+            'filename': PBL_LOG_FILE
         }
     },
     'loggers': {
@@ -36,6 +43,11 @@ LOGGING = {
         'obk': {
             'handlers': ['obk'],
             'level': 'INFO',
+            'propagate': False,
+        },
+        'pbl': {
+            'handlers': ['pbl'],
+            'level': 'DEBUG',
             'propagate': False,
         }
     },

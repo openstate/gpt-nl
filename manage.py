@@ -4,6 +4,7 @@ from datetime import date, timedelta, datetime
 
 from crawlers.officiele_bekendmakingen import Officiele_Bekendmakingen
 from crawlers.kb import KB
+from crawlers.pbl import PBL
 from config import WEBDAV
 from utils import logging
 
@@ -34,6 +35,12 @@ def officiele_bekendmakingen(start_record, end_record):
 def kb(start_page):
     kb = KB(WEBDAV)
     kb.run(start_page)
+
+@cli.command()
+@click.option('--start-page', default='0') # Note: first page has page=0
+def pbl(start_page):
+    pbl = PBL(WEBDAV)
+    pbl.run(start_page)
 
 if __name__ == '__main__':
     cli()
