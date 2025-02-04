@@ -7,6 +7,7 @@ import logging
 from utils.logging import KB_LOG_FILE
 import requests
 import httpx
+from webdav4.client import HTTPError
 
 from utils.webdav_utils import WebDAVUtils
 from lxml import html, etree
@@ -95,6 +96,9 @@ class KB(object):
             exception = e
         except httpx.ReadTimeout as e:
             self._log_message(f"ReadTimeout when uploading {fileType} attempt {attempt}: {e}")
+            exception = e
+        except HTTPError as e:
+            self._log_message(f"HTTPError when uploading {fileType} attempt {attempt}: {e}")
             exception = e
         except Exception as e:
             self._log_message(f"Unknown exception when uploading {fileType} attempt {attempt}: {e.__class__.__name__}, {e}")
