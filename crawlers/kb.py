@@ -7,7 +7,6 @@ import logging
 from utils.logging import KB_LOG_FILE
 import requests
 import httpx
-from webdav4.client import HTTPError
 
 from utils.webdav_utils import WebDAVUtils
 from lxml import html, etree
@@ -80,38 +79,11 @@ class KB(object):
 
     def _upload_book(self, book, identifier):
         filename = f"{identifier}.xml"
-        self._upload_webdav("book", filename, io.BytesIO(etree.tostring(book)))
+        self.webdav_utils.upload_webdav(self._log_message, "book", self.base_dir, filename, io.BytesIO(etree.tostring(book)))
 
     def _upload_metadata(self, metadata_json, identifier):
         filename = f"{identifier}.txt"
-        self._upload_webdav("metadata", filename, io.BytesIO(json.dumps(metadata_json).encode('utf-8')))
-
-    def _upload_webdav(self, fileType, filename, bytesIO, attempt = 1):
-        exception = None
-        try:
-            self.webdav_utils.create_folder(self.base_dir, filename)
-            self.webdav_utils.upload_fileobj(bytesIO, f'{self.base_dir}{filename}', overwrite=True)
-        except httpx.ConnectError as e:
-            self._log_message(f"ConnectError when uploading {fileType} attempt {attempt}: {e}")
-            exception = e
-        except httpx.ReadTimeout as e:
-            self._log_message(f"ReadTimeout when uploading {fileType} attempt {attempt}: {e}")
-            exception = e
-        except HTTPError as e:
-            self._log_message(f"HTTPError when uploading {fileType} attempt {attempt}: {e}")
-            exception = e
-        except Exception as e:
-            self._log_message(f"Unknown exception when uploading {fileType} attempt {attempt}: {e.__class__.__name__}, {e}")
-            raise
-
-        if exception:
-            attempt += 1
-            sleepTime = self._get_sleep_time(attempt)
-            if sleepTime:
-                sleep(sleepTime)
-                self._upload_webdav(fileType, filename, bytesIO, attempt)
-            else:
-                raise exception
+        self.webdav_utils.upload_webdav(self._log_message, "metadata", self.base_dir, filename, io.BytesIO(json.dumps(metadata_json).encode('utf-8')))
 
     def _get_sleep_time(self, attempt):
         if attempt > 9:

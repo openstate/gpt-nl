@@ -41,6 +41,6 @@ class WebDAVUtils():
             sleepTime = self._get_sleep_time(attempt)
             if sleepTime:
                 sleep(sleepTime)
-                self.upload_webdav(fileType, filename, bytesIO, attempt)
+                self.upload_webdav(log_callback, fileType, filename, bytesIO, attempt)
             else:
                 raise exception
