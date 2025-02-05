@@ -88,8 +88,10 @@ class PBL(object):
     def _get_pdf_url_and_metadata(self, report_url):
         doc = self._get_response(report_url).getroot()
         # We can recognize pdfs because the hrefs end with 'pdf'
-        pdf_element = doc.xpath("//aside//a[substring(@href, string-length(@href) - 2) = 'pdf']")[0]
-        pdf_url = urljoin(self.base_url, pdf_element.xpath("@href")[0])
+        pdf_element = doc.xpath("//aside//a[substring(@href, string-length(@href) - 2) = 'pdf']")
+        if len(pdf_element) == 0: # Some hrefs end with "pdf-0"
+            pdf_element = doc.xpath("//aside//a[substring(@href, string-length(@href) - 4) = 'pdf-0']")
+        pdf_url = urljoin(self.base_url, pdf_element[0].xpath("@href")[0])
 
         metadata = {}
         pbl_authors_items = doc.cssselect('.node-publication-full__authors-item')
@@ -129,6 +131,9 @@ class PBL(object):
         pdf_name = pdf_url.split("/")[-1]
         if pdf_name.endswith('pdf'):
             pdf_name = f"{pdf_name[:-3]}.pdf"
+        elif pdf_name.endswith('pdf-0'):
+            pdf_name = f"{pdf_name[:-5]}.pdf"
+
         filename = f"{report_path_id}/{pdf_name}"
         self.webdav_utils.upload_webdav(self._log_message, "report_pdf", self.base_dir, filename, io.BytesIO(pdf))
 
