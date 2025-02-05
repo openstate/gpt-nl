@@ -78,10 +78,6 @@ class PBL(object):
             else:
                 raise exception
 
-    def _non_dutch_report(self, url):
-        # English report urls start with /en/.
-        return re.match("/en/", url)
-
     def _has_been_processed(self, identifier):
         return identifier in self.processed_identifiers
 
@@ -168,10 +164,6 @@ class PBL(object):
                 if self._has_been_processed(report_path):
                     continue
 
-                if self._non_dutch_report(report_path):
-                    self._log_message(f"Report url {report_path} starts with /en/, skipping non-dutch report")
-                    continue
-
                 self._log_message(f"START {report_path} {datetime.now().replace(microsecond=0).isoformat()}")
 
                 pdf_url, metadata = self._get_pdf_url_and_metadata(urljoin(self.base_url, report_path))
@@ -189,7 +181,7 @@ class PBL(object):
                 sleep(1)
 
             if len(report_paths) == 0:
-                logger.info(f"Length of report_paths is 0 for page {next_paginated_results_page}, end of reports reached")
+                self._log_message(f"Length of report_paths is 0 for page {next_paginated_results_page}, end of reports reached")
                 next_paginated_results_page = None
             else:
                 next_paginated_results_page = self._get_next_paginated_results_page(next_paginated_results_page)
