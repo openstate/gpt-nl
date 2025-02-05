@@ -87,11 +87,12 @@ class PBL(object):
 
     def _get_pdf_url_and_metadata(self, report_url):
         doc = self._get_response(report_url).getroot()
-        # We can recognize pdfs because the hrefs end with 'pdf'
-        pdf_element = doc.xpath("//aside//a[substring(@href, string-length(@href) - 2) = 'pdf']")
-        if len(pdf_element) == 0: # Some hrefs end with "pdf-0"
-            pdf_element = doc.xpath("//aside//a[substring(@href, string-length(@href) - 4) = 'pdf-0']")
-        pdf_url = urljoin(self.base_url, pdf_element[0].xpath("@href")[0])
+        # The pdf we are interested in is contained in the first <li> in <aside>. Note
+        # that the text for the link can be anything and cannot be used for selection.
+        # Also note that some of these "pdf_url"s point to external webpages, these
+        # will be filtered out later on when attempting to download the pdf.
+        pdf_element = doc.xpath("//aside/ul/li[1]/a")[0]
+        pdf_url = urljoin(self.base_url, pdf_element.xpath("@href")[0])
 
         metadata = {}
         pbl_authors_items = doc.cssselect('.node-publication-full__authors-item')
@@ -119,7 +120,12 @@ class PBL(object):
 
     def _get_pdf(self, pdf_url):
         try:
-            return self.session.get(pdf_url).content
+            response = self.session.get(pdf_url)
+            content_type = response.headers['content-type']
+            if content_type != 'application/pdf':
+                self._log_message(f"...ERROR: unsupported content type {content_type}")
+                return None
+            return response.content
         except HTTPError as e:
             self._log_message(f'HTTPError occurred during pdf download: {e}')
             raise
@@ -133,6 +139,8 @@ class PBL(object):
             pdf_name = f"{pdf_name[:-3]}.pdf"
         elif pdf_name.endswith('pdf-0'):
             pdf_name = f"{pdf_name[:-5]}.pdf"
+        else:
+            pdf_name = f"{pdf_name}.pdf"
 
         filename = f"{report_path_id}/{pdf_name}"
         self.webdav_utils.upload_webdav(self._log_message, "report_pdf", self.base_dir, filename, io.BytesIO(pdf))
@@ -168,8 +176,12 @@ class PBL(object):
 
                 pdf_url, metadata = self._get_pdf_url_and_metadata(urljoin(self.base_url, report_path))
 
-                report_path_id = report_path.split("/")[-1]
                 pdf = self._get_pdf(pdf_url)
+                if pdf is None:
+                    self._log_message("...ERROR: no pdf found for pdf_url, skipping this report")
+                    continue
+
+                report_path_id = report_path.split("/")[-1]
                 self._upload_pdf(pdf, pdf_url, report_path_id)
                 self._upload_metadata(metadata, report_path_id)
 
