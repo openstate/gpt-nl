@@ -18,6 +18,11 @@ class WebDAVUtils():
     def upload_fileobj(self, content, filename, **kwargs):
         self.client.upload_fileobj(content, filename, **kwargs)
 
+    def _get_sleep_time(self, attempt):
+        if attempt > 9:
+            return None
+        return 2**attempt
+
     def upload_webdav(self, log_callback, fileType, base_dir, filename, bytesIO, attempt = 1):
         exception = None
         try:
@@ -41,6 +46,6 @@ class WebDAVUtils():
             sleepTime = self._get_sleep_time(attempt)
             if sleepTime:
                 sleep(sleepTime)
-                self.upload_webdav(log_callback, fileType, filename, bytesIO, attempt)
+                self.upload_webdav(log_callback, fileType, base_dir, filename, bytesIO, attempt)
             else:
                 raise exception
