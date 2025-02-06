@@ -5,6 +5,7 @@ PROJECT_PATH = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 KB_LOG_FILE = os.path.join(PROJECT_PATH, 'kb.log')
 OBK_LOG_FILE = os.path.join(PROJECT_PATH, 'officiele_bekendmakingen.log')
 PBL_LOG_FILE = os.path.join(PROJECT_PATH, 'pbl.log')
+NATURALIS_LOG_FILE = os.path.join(PROJECT_PATH, 'naturalis.log')
 
 LOGGING = {
     'version': 1,
@@ -32,6 +33,12 @@ LOGGING = {
             'class': 'logging.FileHandler',
             'formatter': 'gpt',
             'filename': PBL_LOG_FILE
+        },
+        'naturalis': {
+            'level': 'DEBUG',
+            'class': 'logging.FileHandler',
+            'formatter': 'gpt',
+            'filename': NATURALIS_LOG_FILE
         }
     },
     'loggers': {
@@ -47,6 +54,11 @@ LOGGING = {
         },
         'pbl': {
             'handlers': ['pbl'],
+            'level': 'DEBUG',
+            'propagate': False,
+        },
+        'naturalis': {
+            'handlers': ['naturalis'],
             'level': 'DEBUG',
             'propagate': False,
         }
