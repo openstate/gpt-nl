@@ -160,23 +160,17 @@ class Naturalis(object):
         return pdf_url, metadata
 
     def _get_authors(self, doc):
-        author_elements = self._get_mods_child(doc, '//mods:mods/mods:name[@type=\'personal\']/mods:namePart')
+        author_elements = self._get_mods_child(doc, '//mods:mods/mods:name[@type=\'personal\']')
         authors = []
-        first_name = None
-        last_name = None
         for author_element in author_elements:
-            type = author_element.attrib['type']
-            if type == 'family':
-                last_name = author_element.text
-            elif type == 'given':
-                first_name = author_element.text
+            first_name = self._get_mods_child(author_element, './mods:namePart[@type="given"]/text()')
+            if len(first_name) == 0:
+                name = self._get_mods_child(author_element, './mods:displayForm/text()')[0]
+                authors.append(name)
             else:
-                raise Exception("Unknown element type for author")
-            
-            if first_name and last_name:
+                first_name = first_name[0]
+                last_name = self._get_mods_child(author_element, './mods:namePart[@type="family"]/text()')[0]
                 authors.append(f"{first_name} {last_name}")
-                first_name = None
-                last_name = None
 
         return authors
 
