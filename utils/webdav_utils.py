@@ -37,6 +37,9 @@ class WebDAVUtils():
         except httpx.ReadTimeout as e:
             log_callback(f"ReadTimeout when uploading {fileType} attempt {attempt}: {e}")
             exception = e
+        except httpx.RemoteProtocolError as e:
+            log_callback(f"RemoteProtocolError when uploading {fileType} attempt {attempt}: {e}")
+            exception = e
         except HTTPError as e:
             log_callback(f"HTTPError when uploading {fileType} attempt {attempt}: {e}")
             exception = e
