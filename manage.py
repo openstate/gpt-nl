@@ -5,6 +5,7 @@ from datetime import date, timedelta, datetime
 from crawlers.officiele_bekendmakingen import Officiele_Bekendmakingen
 from crawlers.kb import KB
 from crawlers.pbl import PBL
+from crawlers.naturalis import Naturalis
 from config import WEBDAV
 from utils import logging
 
@@ -41,6 +42,12 @@ def kb(start_page):
 def pbl(start_page):
     pbl = PBL(WEBDAV)
     pbl.run(start_page)
+
+@cli.command()
+@click.option('--resumption-token')
+def naturalis(resumption_token):
+    naturalis = Naturalis(WEBDAV)
+    naturalis.run(resumption_token)
 
 if __name__ == '__main__':
     cli()
