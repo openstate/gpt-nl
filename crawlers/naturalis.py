@@ -223,8 +223,8 @@ class Naturalis(object):
         
         journal = journal[0].text
 
-        volume = self._get_mods_child(doc, f'{related_item}/mods:part/mods:detail[@type="volume"]//*[normalize-space()]/text()')[0]
-        # issue and page numbers are optional
+        volume_elements = self._get_mods_child(doc, f'{related_item}/mods:part/mods:detail[@type="volume"]//*[normalize-space()]/text()')
+        volume = volume_elements[0] if len(volume_elements) > 0 else None
         issue_elements = self._get_mods_child(doc, f'{related_item}/mods:part/mods:detail[@type="issue"]//*[normalize-space()]/text()')
         issue = issue_elements[0] if len(issue_elements) > 0 else None
 
