@@ -131,7 +131,9 @@ class Naturalis(object):
 
         rights = self._get_didl_child(doc, '//didl:DIDL//dcterms:accessRights/text()')[0]
 
-        citation = f"{', '.join(authors)} ({publication_date.year}). {title}. {journal_reference}."
+        citation = f"{', '.join(authors)} ({publication_date.year}). {title}."
+        if journal_reference:
+            citation += f" {journal_reference}."
         if doi_identifier:
             citation += f" {doi_identifier}"
 
@@ -222,9 +224,10 @@ class Naturalis(object):
         oai_dc_url = url.replace(f"metadataPrefix={self.metadata_prefix}", "metadataPrefix=oai_dc")
         doc = self._get_response(oai_dc_url).getroot()
 
-        # TODO for oai:repository.naturalis.nl:406907 no reference available
-        reference = self._get_oai_dc_child(doc, f"//oai:dc/dc:source/text()")[0]
-        journal = reference.split(" vol.")[0] # This assumes that name of journal is always followed by " vol."
+        reference = self._get_oai_dc_child(doc, f"//oai:dc/dc:source/text()")
+        if len(reference) == 0:
+            return None, None
+        journal = reference[0].split(" vol.")[0] # This assumes that name of journal is always followed by " vol."
 
         return journal, reference
 
