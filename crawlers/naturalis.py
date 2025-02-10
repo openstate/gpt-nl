@@ -107,7 +107,7 @@ class Naturalis(object):
         doc = self._get_response(url).getroot()
 
         didl_identifier = self._get_didl_child(doc, '//didl:DIDL//dii:Identifier/text()')[0]
-        pdf_url = self._get_mods_child(doc, '//mods:mods/mods:location/mods:url[@access=\'raw object\']')[0].text
+        pdf_url = self._get_pdf_url(doc)
         title = self._get_mods_child(doc, '//mods:mods/mods:titleInfo/mods:title')[0].text
 
         author_elements = self._get_mods_child(doc, '//mods:mods/mods:name[@type=\'personal\']/mods:displayForm')
@@ -121,8 +121,16 @@ class Naturalis(object):
         except ValueError as e:
             publication_date = None
 
-        file_size = self._get_mods_child(doc, '//mods:physicalDescription/mods:extent/text()')[0]
-        file_type = self._get_mods_child(doc, '//mods:physicalDescription/mods:internetMediaType/text()')[0]
+        file_size = self._get_mods_child(doc, '//mods:physicalDescription/mods:extent/text()')
+        if len(file_size) > 0:
+            file_size = file_size[0]
+        else:
+            file_size = None
+        file_type = self._get_mods_child(doc, '//mods:physicalDescription/mods:internetMediaType/text()')
+        if len(file_type) > 0:
+            file_type = file_type[0]
+        else:
+            file_type = None
 
         doi_identifier_element = self._get_mods_child(doc, '//mods:mods/mods:identifier[@type="doi"]/text()')
         doi_identifier = doi_identifier_element[0] if len(doi_identifier_element) > 0 else None
@@ -161,6 +169,19 @@ class Naturalis(object):
 
         return pdf_url, metadata
 
+    def _get_pdf_url(self, doc):
+        pdf_url = self._get_mods_child(doc, '//mods:mods/mods:location/mods:url[@access=\'raw object\']/text()')
+        if len(pdf_url) > 0:
+            pdf_url = pdf_url[0]
+        else:
+            pdf_url = self._get_didl_child(doc, '//didl:DIDL//didl:Resource[@mimeType="application/pdf"]/@ref')
+            if len(pdf_url) > 0:
+                pdf_url = pdf_url[0]
+            else:
+                return None
+
+        return pdf_url
+    
     def _get_authors(self, doc):
         author_elements = self._get_mods_child(doc, '//mods:mods/mods:name[@type=\'personal\']')
         authors = []
