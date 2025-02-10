@@ -167,8 +167,9 @@ class Naturalis(object):
         for author_element in author_elements:
             first_name = self._get_mods_child(author_element, './mods:namePart[@type="given"]/text()')
             if len(first_name) == 0:
-                name = self._get_mods_child(author_element, './mods:displayForm/text()')[0]
-                authors.append(name)
+                name = self._get_mods_child(author_element, './mods:displayForm/text()')
+                if len(name) > 0:
+                    authors.append(name[0])
             else:
                 first_name = first_name[0]
                 last_name = self._get_mods_child(author_element, './mods:namePart[@type="family"]/text()')[0]
