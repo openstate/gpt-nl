@@ -253,6 +253,8 @@ class Naturalis(object):
         while True:
             self._log_message(f"Using resumption token: {resumption_token}")
             identifiers, resumption_token = self._get_identifiers(self._query_url(resumption_token))
+            if len(identifiers) == 0:
+                self._log_message(f"WARNING: no identifiers found for resumption token {resumption_token}")
 
             for identifier_index, identifier in enumerate(identifiers, start=1):                
                 self._log_message(f"Identifier index on this page: {identifier_index}")
