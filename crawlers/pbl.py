@@ -52,6 +52,11 @@ class PBL(object):
         report_paths = [link.xpath("@href")[0] for link in links]
         return report_paths
 
+    def _get_sleep_time(self, attempt):
+        if attempt > 9:
+            return None
+        return 2**attempt
+
     def _get_response(self, url, attempt = 1):
         exception = None
         try:

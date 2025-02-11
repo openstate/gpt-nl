@@ -73,10 +73,15 @@ class Naturalis(object):
         parser = etree.ETXPath("//{%s}header[not(contains(@status, 'deleted'))]/{%s}identifier" % (self.oai_namespace, self.oai_namespace))
         identifiers  = [identifier.text for identifier in parser(list_xml)]
         resumption_token = list_xml.find('.//{*}resumptionToken')
-        if resumption_token:
+        if resumption_token is not None:
             resumption_token = resumption_token.text
         
         return identifiers, resumption_token
+
+    def _get_sleep_time(self, attempt):
+        if attempt > 9:
+            return None
+        return 2**attempt
 
     def _get_response(self, url, attempt = 1):
         exception = None
