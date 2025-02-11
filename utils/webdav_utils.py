@@ -1,7 +1,7 @@
 import httpx
 from time import sleep
 
-from webdav4.client import Client, HTTPError
+from webdav4.client import Client
 
 class WebDAVUtils():
     def __init__(self, settings):
@@ -40,8 +40,11 @@ class WebDAVUtils():
         except httpx.RemoteProtocolError as e:
             log_callback(f"RemoteProtocolError when uploading {fileType} attempt {attempt}: {e}")
             exception = e
-        except HTTPError as e:
+        except webdav4.client.HTTPError as e:
             log_callback(f"HTTPError when uploading {fileType} attempt {attempt}: {e}")
+            exception = e
+        except webdav4.client.BadGatewayError as e:
+            log_callback(f"BadGatewayError when uploading {fileType} attempt {attempt}: {e}")
             exception = e
         except Exception as e:
             log_callback(f"Unknown exception when uploading {fileType} attempt {attempt}: {e.__class__.__name__}, {e}")
