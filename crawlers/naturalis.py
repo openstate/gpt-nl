@@ -72,7 +72,9 @@ class Naturalis(object):
         list_xml = etree.parse(urlopen(url))
         parser = etree.ETXPath("//{%s}header[not(contains(@status, 'deleted'))]/{%s}identifier" % (self.oai_namespace, self.oai_namespace))
         identifiers  = [identifier.text for identifier in parser(list_xml)]
-        resumption_token = list_xml.find('.//{*}resumptionToken').text
+        resumption_token = list_xml.find('.//{*}resumptionToken')
+        if resumption_token:
+            resumption_token = resumption_token.text
         
         return identifiers, resumption_token
 
