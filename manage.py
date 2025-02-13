@@ -6,6 +6,7 @@ from crawlers.officiele_bekendmakingen import Officiele_Bekendmakingen
 from crawlers.kb import KB
 from crawlers.pbl import PBL
 from crawlers.naturalis import Naturalis
+from crawlers.ep import EP
 from config import WEBDAV
 from utils import logging
 
@@ -48,6 +49,12 @@ def pbl(start_page):
 def naturalis(resumption_token):
     naturalis = Naturalis(WEBDAV)
     naturalis.run(resumption_token)
+
+@cli.command()
+@click.option('--start-date') # Search this day and backwards in time (format YYYY-mm-dd)
+def ep(start_date):
+    ep = EP(WEBDAV)
+    ep.run(start_date)
 
 if __name__ == '__main__':
     cli()
