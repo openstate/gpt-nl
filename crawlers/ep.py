@@ -10,8 +10,11 @@ from urllib.request import urlopen
 from utils.logging import EP_LOG_FILE
 from utils.webdav_utils import WebDAVUtils
 from lxml import etree, html
+from requests.exceptions import HTTPError
 
 logger = logging.getLogger('ep')
+HTML_TYPE = 'html'
+XML_TYPE = 'xml'
 
 class EP(object):
     def __init__(self, settings):
@@ -85,35 +88,62 @@ class EP(object):
 
     def _get_report_path_from_report_page(self, report_page):
         doc = html.fromstring(report_page)
-        xml_elements = doc.xpath("//a[substring(@href, string-length(@href) - 3) = '.xml']/@href")
-        if len(xml_elements) != 1:
-            message = f"... number of XML links encountered not equal to 1 ({len(xml_elements)})"
-            self._log_message(message)
-            raise Exception(message)
-        return xml_elements[0]
+        container = "//table[contains(concat(' ', @class, ' '), ' doc_formats_box ')]"
+        xml_elements = doc.xpath(f"{container}//a[substring(@href, string-length(@href) - 3) = '.xml']/@href")
+        if len(xml_elements) == 1:
+            return XML_TYPE, xml_elements[0]
+
+        message = f"... number of XML links encountered not equal to 1 ({len(xml_elements)})"
+        self._log_message(message)
+        html_elements = doc.xpath(f"{container}//a[substring(@href, string-length(@href) - 4) = '.html']/@href")
+        if len(html_elements) == 1:
+            return HTML_TYPE, html_elements[0]
+
+        message = f"... number of HTML links encountered not equal to 1 ({len(html_elements)})"
+        self._log_message(message)
+        raise Exception(message)
 
     def _get_minutes_path_from_report_page(self, report_page):
         return report_page.replace("CRE-", "PV-").replace("-TOC", "")
 
-    def _get_report(self, report_path):
+    def _get_report(self, report_type, report_path):
         report_url = self.base_url + report_path
+        if report_type == XML_TYPE:
+            return self._get_xml_doc('report', report_url)
+        elif report_type == HTML_TYPE:
+            return self._get_html_doc('report', report_url)
+        else:
+            raise Exception(f"... unknown report type {report_type}")
+
+    def _get_xml_doc(self, doc_type, url):
         try:
-            return etree.parse(urlopen(report_url))
+            return etree.parse(urlopen(url))
         except etree.XMLSyntaxError as e:
-            logger.info(f"XMLSyntaxError for report_path {report_url}")
+            self._log_message(f"XMLSyntaxError occurred during xml download of {doc_type} {url}, {e}")
             raise
 
-    def _get_minutes(self, minutes_path):
+    def _get_html_doc(self, doc_type, url):
+        try:
+            return html.parse(urlopen(url))
+        except HTTPError as e:
+            self._log_message(f"HTTPError occurred during html download of {doc_type} {url}, {e}")
+            raise
+        except Exception as e:
+            self._log_message(f"Unknown error occurred during html download of {doc_type} {url}, {e}")
+            raise
+
+    def _get_minutes(self, report_type, minutes_path):
         minutes_url = self.base_url + minutes_path
-        try:
-            return etree.parse(urlopen(minutes_url))
-        except etree.XMLSyntaxError as e:
-            logger.info(f"XMLSyntaxError for minutes_path {minutes_url}")
-            raise
+        if report_type == XML_TYPE:
+            return self._get_xml_doc('minutes', minutes_url)
+        elif report_type == HTML_TYPE:
+            return self._get_html_doc('minutes', minutes_url)
+        else:
+            raise Exception(f"... unknown report type {report_type}")
 
-    def _upload_docs(self, report, minutes, date_str):
-        self.webdav_utils.upload_webdav(self._log_message, "report", self.base_dir, f"{date_str}/volledig_verslag.xml", io.BytesIO(etree.tostring(report)))
-        self.webdav_utils.upload_webdav(self._log_message, "minutes", self.base_dir, f"{date_str}/notulen.xml", io.BytesIO(etree.tostring(minutes)))
+    def _upload_docs(self, report, minutes, report_type, date_str):
+        self.webdav_utils.upload_webdav(self._log_message, "report", self.base_dir, f"{date_str}/volledig_verslag.{report_type}", io.BytesIO(etree.tostring(report)))
+        self.webdav_utils.upload_webdav(self._log_message, "minutes", self.base_dir, f"{date_str}/notulen.{report_type}", io.BytesIO(etree.tostring(minutes)))
 
     def _get_next_date(self, date):
         return date - timedelta(1)
@@ -128,7 +158,7 @@ class EP(object):
         query_url = self.base_url + '/sides/getDoc.do?pubRef=-//EP//TEXT+CRE+{}+TOC+DOC+XML+V0//NL'
 
         if start_date:
-            date = datetime.strptime(start_date, "%Y-%m-%d")
+            date = datetime.strptime(start_date, "%Y-%m-%d").date()
         else:
             date = datetime.now().date()
 
@@ -152,11 +182,11 @@ class EP(object):
                 self._log_message(message)
                 raise Exception(message)
 
-            report_path = self._get_report_path_from_report_page(report_page)
-            report = self._get_report(report_path)
+            report_type, report_path = self._get_report_path_from_report_page(report_page)
+            report = self._get_report(report_type, report_path)
             minutes_path = self._get_minutes_path_from_report_page(report_path)
-            minutes = self._get_minutes(minutes_path)
-            self._upload_docs(report, minutes, date_str)
+            minutes = self._get_minutes(report_type, minutes_path)
+            self._upload_docs(report, minutes, report_type, date_str)
 
             self._log_end_message(date_str)
 
