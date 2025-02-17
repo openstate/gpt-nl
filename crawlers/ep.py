@@ -59,7 +59,7 @@ class EP(object):
         try:
             response = self.session.get(url)
             if response.status_code == 404:
-                return response.status_code, None # No report for this day
+                return response.status_code, '' # No report for this day
             else:
                 return response.status_code, response.text
         except httpx.ConnectError as e:
@@ -75,14 +75,13 @@ class EP(object):
             self._log_message(f"Unknown exception when getting paginated results  attempt {attempt}: {e.__class__.__name__}, {e}")
             raise
 
-        if exception:
-            attempt += 1
-            sleepTime = self._get_sleep_time(attempt)
-            if sleepTime:
-                sleep(sleepTime)
-                return self._get_report_page(url, attempt)
-            else:
-                raise exception
+        attempt += 1
+        sleepTime = self._get_sleep_time(attempt)
+        if sleepTime:
+            sleep(sleepTime)
+            return self._get_report_page(url, attempt)
+        else:
+            raise exception
 
     def _get_report_path_from_report_page(self, report_page):
         doc = html.fromstring(report_page)
@@ -93,17 +92,28 @@ class EP(object):
             raise Exception(message)
         return xml_elements[0]
 
+    def _get_minutes_path_from_report_page(self, report_page):
+        return report_page.replace("CRE-", "PV-").replace("-TOC", "")
+
     def _get_report(self, report_path):
         report_url = self.base_url + report_path
         try:
             return etree.parse(urlopen(report_url))
         except etree.XMLSyntaxError as e:
-            logger.info(f"XMLSyntaxError for report_path {report_path}")
+            logger.info(f"XMLSyntaxError for report_path {report_url}")
             raise
 
-    def _upload_report(self, report, date_str):
-        filename = f"{date_str}.xml"
-        self.webdav_utils.upload_webdav(self._log_message, "report", self.base_dir, filename, io.BytesIO(etree.tostring(report)))
+    def _get_minutes(self, minutes_path):
+        minutes_url = self.base_url + minutes_path
+        try:
+            return etree.parse(urlopen(minutes_url))
+        except etree.XMLSyntaxError as e:
+            logger.info(f"XMLSyntaxError for minutes_path {minutes_url}")
+            raise
+
+    def _upload_docs(self, report, minutes, date_str):
+        self.webdav_utils.upload_webdav(self._log_message, "report", self.base_dir, f"{date_str}/volledig_verslag.xml", io.BytesIO(etree.tostring(report)))
+        self.webdav_utils.upload_webdav(self._log_message, "minutes", self.base_dir, f"{date_str}/notulen.xml", io.BytesIO(etree.tostring(minutes)))
 
     def _get_next_date(self, date):
         return date - timedelta(1)
@@ -143,9 +153,11 @@ class EP(object):
                 raise Exception(message)
 
             report_path = self._get_report_path_from_report_page(report_page)
-
             report = self._get_report(report_path)
-            self._upload_report(report, date_str)
+            minutes_path = self._get_minutes_path_from_report_page(report_path)
+            self._log_message(f"RVD minutes_path {minutes_path}")
+            minutes = self._get_minutes(minutes_path)
+            self._upload_docs(report, minutes, date_str)
 
             self._log_end_message(date_str)
 
