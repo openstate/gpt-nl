@@ -15,6 +15,7 @@ from requests.exceptions import HTTPError
 logger = logging.getLogger('ep')
 HTML_TYPE = 'html'
 XML_TYPE = 'xml'
+PDF_TYPE = 'pdf'
 
 class EP(object):
     def __init__(self, settings):
@@ -101,6 +102,12 @@ class EP(object):
 
         message = f"... number of HTML links encountered not equal to 1 ({len(html_elements)})"
         self._log_message(message)
+        pdf_elements = doc.xpath(f"{container}//a[substring(@href, string-length(@href) - 3) = '.pdf']/@href")
+        if len(pdf_elements) == 1:
+            return PDF_TYPE, pdf_elements[0]
+
+        message = f"... number of PDF links encountered not equal to 1 ({len(pdf_elements)})"
+        self._log_message(message)
         raise Exception(message)
 
     def _get_minutes_path_from_report_page(self, report_page):
@@ -112,6 +119,8 @@ class EP(object):
             return self._get_xml_doc('report', report_url)
         elif report_type == HTML_TYPE:
             return self._get_html_doc('report', report_url)
+        elif report_type == PDF_TYPE:
+            return self._get_pdf_doc('report', report_url)
         else:
             raise Exception(f"... unknown report type {report_type}")
 
@@ -132,12 +141,25 @@ class EP(object):
             self._log_message(f"Unknown error occurred during html download of {doc_type} {url}, {e}")
             raise
 
+    def _get_pdf_doc(self, doc_type, url):
+        try:
+            return self.session.get(url).content
+        except HTTPError as e:
+            self._log_message(f'HTTPError occurred during pdf download of {doc_type} {url}: {e}')
+            raise
+        except Exception as e:
+            self._log_message(f'Unknown error occurred during pdf download of {doc_type} {url}: {e}')
+            raise
+
+
     def _get_minutes(self, report_type, minutes_path):
         minutes_url = self.base_url + minutes_path
         if report_type == XML_TYPE:
             return self._get_xml_doc('minutes', minutes_url)
         elif report_type == HTML_TYPE:
             return self._get_html_doc('minutes', minutes_url)
+        elif report_type == PDF_TYPE:
+            return self._get_pdf_doc('minutes', minutes_url)
         else:
             raise Exception(f"... unknown report type {report_type}")
 
