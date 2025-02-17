@@ -155,7 +155,6 @@ class EP(object):
             report_path = self._get_report_path_from_report_page(report_page)
             report = self._get_report(report_path)
             minutes_path = self._get_minutes_path_from_report_page(report_path)
-            self._log_message(f"RVD minutes_path {minutes_path}")
             minutes = self._get_minutes(minutes_path)
             self._upload_docs(report, minutes, date_str)
 
