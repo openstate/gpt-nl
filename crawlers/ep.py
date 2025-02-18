@@ -164,8 +164,15 @@ class EP(object):
             raise Exception(f"... unknown report type {report_type}")
 
     def _upload_docs(self, report, minutes, report_type, date_str):
-        self.webdav_utils.upload_webdav(self._log_message, "report", self.base_dir, f"{date_str}/volledig_verslag.{report_type}", io.BytesIO(etree.tostring(report)))
-        self.webdav_utils.upload_webdav(self._log_message, "minutes", self.base_dir, f"{date_str}/notulen.{report_type}", io.BytesIO(etree.tostring(minutes)))
+        if report_type == PDF_TYPE:
+            report_stream = io.BytesIO(report)
+            minutes_stream = io.BytesIO(minutes)
+        else:
+            report_stream = io.BytesIO(etree.tostring(report))
+            minutes_stream = io.BytesIO(etree.tostring(minutes))
+
+        self.webdav_utils.upload_webdav(self._log_message, "report", self.base_dir, f"{date_str}/volledig_verslag.{report_type}", report_stream)
+        self.webdav_utils.upload_webdav(self._log_message, "minutes", self.base_dir, f"{date_str}/notulen.{report_type}", minutes_stream)
 
     def _get_next_date(self, date):
         return date - timedelta(1)
