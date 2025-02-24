@@ -29,7 +29,7 @@ class EP(object):
 
         self.base_url = 'https://www.europarl.europa.eu'
 
-        self.earliest_date = datetime(2010, 1, 1).date()
+        self.earliest_date = datetime(1991, 1, 1).date()
 
     def _has_been_processed(self, identifier):
         return identifier in self.processed_identifiers
