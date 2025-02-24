@@ -28,7 +28,7 @@ Voor Naturalis gaat het om alle artikelen van https://repository.naturalis.nl/.
 
 ## Oplevering
 
-Per artikel is een subdirectory aangemaakt met als naam de `identifier`. In de folder staan de volgende bestanden:
+Per artikel is een submap aangemaakt met als naam de `identifier`. In de submap staan de volgende bestanden:
 
 - een .pdf bestand met de inhoud van het artikel
 
