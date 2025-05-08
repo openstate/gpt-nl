@@ -1,4 +1,5 @@
 # This script should be run in the ori_backend_1 container of the ORI project
+#   sudo docker exec ori_backend_1 /bin/sh -c "python gpt_nl_export.py" >> gpt_nl_export.log
 import math
 import os
 import pathlib
@@ -10,8 +11,10 @@ from ocd_backend.models.postgres_models import StoredDocument
 from ocd_backend.settings import DATA_DIR_PATH, PROJECT_PATH
 
 class GPTNLExport:
-    START_ID = 1
-    END_ID = 1449449
+    # START_ID = 1
+    # END_ID = 1449449
+    START_ID = 1449000
+    END_ID = 2738999
     BATCH_SIZE = 1000
 
     def __init__(self):
