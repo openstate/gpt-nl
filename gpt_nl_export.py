@@ -1,5 +1,8 @@
 # This script should be run in the ori_backend_1 container of the ORI project
 #   sudo docker exec ori_backend_1 /bin/sh -c "python gpt_nl_export.py" >> gpt_nl_export.log
+#   cd gpt_nl/
+#   tar -cvf ori.tar *
+#   gzip and upload to Research Drive
 import math
 import os
 import pathlib
