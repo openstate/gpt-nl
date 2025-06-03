@@ -16,8 +16,10 @@ from ocd_backend.settings import DATA_DIR_PATH, PROJECT_PATH
 class GPTNLExport:
     # START_ID = 1
     # END_ID = 1449449
-    START_ID = 1449000
-    END_ID = 2738999
+    # START_ID = 1449000
+    # END_ID = 2738999
+    START_ID = 2739000
+    END_ID = 3738999
     BATCH_SIZE = 1000
 
     def __init__(self):
