@@ -18,8 +18,12 @@ class GPTNLExport:
     # END_ID = 1449449
     # START_ID = 1449000
     # END_ID = 2738999
-    START_ID = 2739000
-    END_ID = 3738999
+    # START_ID = 2739000
+    # END_ID = 3738999
+    # START_ID = 3739000
+    # END_ID = 4647000
+    START_ID = 4647000
+    END_ID = 4691815
     BATCH_SIZE = 1000
 
     def __init__(self):
